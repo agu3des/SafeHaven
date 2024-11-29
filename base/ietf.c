@@ -8,40 +8,40 @@ Request for Comments: 1321           MIT Laboratory for Computer Science
 
 Status of this Memo
 
-   This memo provides information for the Internet community.  It does
-   not specify an Internet standard.  Distribution of this memo is
-   unlimited.
+  This memo provides information for the Internet community.  It does
+  not specify an Internet standard.  Distribution of this memo is
+  unlimited.
 
 Acknowlegements
 
-   We would like to thank Don Coppersmith, Burt Kaliski, Ralph Merkle,
-   David Chaum, and Noam Nisan for numerous helpful comments and
-   suggestions.
+  We would like to thank Don Coppersmith, Burt Kaliski, Ralph Merkle,
+  David Chaum, and Noam Nisan for numerous helpful comments and
+  suggestions.
 
 Table of Contents
 
-   1. Executive Summary                                                1
-   2. Terminology and Notation                                         2
-   3. MD5 Algorithm Description                                        3
-   4. Summary                                                          6
-   5. Differences Between MD4 and MD5                                  6
-   References                                                          7
-   APPENDIX A - Reference Implementation                               7
-   Security Considerations                                            21
-   Author's Address                                                   21
+  1. Executive Summary                                                1
+  2. Terminology and Notation                                         2
+  3. MD5 Algorithm Description                                        3
+  4. Summary                                                          6
+  5. Differences Between MD4 and MD5                                  6
+  References                                                          7
+  APPENDIX A - Reference Implementation                               7
+  Security Considerations                                            21
+  Author,s Address                                                   21
 
 1. Executive Summary
 
-   This document describes the MD5 message-digest algorithm. The
-   algorithm takes as input a message of arbitrary length and produces
-   as output a 128-bit "fingerprint" or "message digest" of the input.
-   It is conjectured that it is computationally infeasible to produce
-   two messages having the same message digest, or to produce any
-   message having a given prespecified target message digest. The MD5
-   algorithm is intended for digital signature applications, where a
-   large file must be "compressed" in a secure manner before being
-   encrypted with a private (secret) key under a public-key cryptosystem
-   such as RSA.
+  This document describes the MD5 message-digest algorithm. The
+  algorithm takes as input a message of arbitrary length and produces
+  as output a 128-bit "fingerprint" or "message digest" of the input.
+  It is conjectured that it is computationally infeasible to produce
+  two messages having the same message digest, or to produce any
+  message having a given prespecified target message digest. The MD5
+  algorithm is intended for digital signature applications, where a
+  large file must be "compressed" in a secure manner before being
+  encrypted with a private (secret) key under a public-key cryptosystem
+  such as RSA.
 
 
 
@@ -70,7 +70,7 @@ RFC 1321              MD5 Message-Digest Algorithm            April 1992
    optimizations. The MD5 algorithm is being placed in the public domain
    for review and possible adoption as a standard.
 
-   For OSI-based applications, MD5's object identifier is
+   For OSI-based applications, MD5,s object identifier is
 
    md5 OBJECT IDENTIFIER ::=
      iso(1) member-body(2) US(840) rsadsi(113549) digestAlgorithm(2) 5}
@@ -340,7 +340,7 @@ References
        RSA Data Security, Inc., April 1992.
 
    [2] Rivest, R., "The MD4 message digest algorithm", in A.J.  Menezes
-       and S.A. Vanstone, editors, Advances in Cryptology - CRYPTO '90
+       and S.A. Vanstone, editors, Advances in Cryptology - CRYPTO 90
        Proceedings, pages 303-311, Springer-Verlag, 1991.
 
    [3] CCITT Recommendation X.509 (1988), "The Directory -
@@ -377,7 +377,7 @@ APPENDIX A - Reference Implementation
 A.1 global.h
 
 /* GLOBAL.H - RSAREF types and constants
- */
+*/
 
 /* PROTOTYPES should be set to one if and only if the compiler supports
   function argument prototyping.
@@ -391,7 +391,7 @@ RFC 1321              MD5 Message-Digest Algorithm            April 1992
 
 
   been defined with C compiler flags.
- */
+*/
 #ifndef PROTOTYPES
 #define PROTOTYPES 0
 #endif
@@ -408,7 +408,7 @@ typedef unsigned long int UINT4;
 /* PROTO_LIST is defined depending on how PROTOTYPES is defined above.
 If using PROTOTYPES, then PROTO_LIST returns the list, otherwise it
   returns an empty list.
- */
+*/
 #if PROTOTYPES
 #define PROTO_LIST(list) list
 #else
@@ -418,7 +418,7 @@ If using PROTOTYPES, then PROTO_LIST returns the list, otherwise it
 A.2 md5.h
 
 /* MD5.H - header file for MD5C.C
- */
+*/
 
 /* Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
 rights reserved.
@@ -448,7 +448,7 @@ RFC 1321              MD5 Message-Digest Algorithm            April 1992
 
 These notices must be retained in any copies of any part of this
 documentation and/or software.
- */
+*/
 
 /* MD5 context. */
 typedef struct {
@@ -465,7 +465,7 @@ void MD5Final PROTO_LIST ((unsigned char [16], MD5_CTX *));
 A.3 md5c.c
 
 /* MD5C.C - RSA Data Security, Inc., MD5 message-digest algorithm
- */
+*/
 
 /* Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
 rights reserved.
