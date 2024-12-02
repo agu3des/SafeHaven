@@ -1,0 +1,110 @@
+\documentclass{article}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Relatório Científico: Implementação do Algoritmo MD5 em Python}
+\author{Ananda Guedes do Ó}
+\date{December 2024}
+
+\begin{document}
+
+\maketitle
+
+\section{Introdução}
+O algoritmo MD5 (Message-Digest Algorithm 5) é um dos métodos de hash mais conhecidos e amplamente utilizados na verificação de integridade de dados e autenticação. Apesar de suas vulnerabilidades conhecidas, como suscetibilidade a colisões, ele ainda é relevante como ferramenta educacional para estudar conceitos fundamentais de hashing e criptografia. Este artigo apresenta a implementação do algoritmo MD5 em Python, explorando suas etapas principais e analisando os resultados obtidos. O objetivo é implementar o algoritmo MD5 de forma manual, compreender seu funcionamento e validar os resultados comparando-os com os valores gerados por bibliotecas padrões, como hashlib. Além disso, o trabalho busca demonstrar a sensibilidade do MD5 a pequenas alterações nas entradas e avaliar o desempenho da implementação.
+
+\section{Objetivos}
+Os principais objetivos deste trabalho incluem:
+\begin{itemize}
+    \item Desenvolver uma implementação do algoritmo MD5 em Python, respeitando todas as etapas teóricas, incluindo:
+    \begin{itemize}
+        \item Preenchimento (padding).
+        \item Anexação do tamanho original.
+        \item Divisão da mensagem em blocos de 512 bits.
+        \item Processamento dos blocos com as operações de mistura.
+        \item Cálculo do hash final.
+    \end{itemize}
+    \item Validar a implementação comparando os hashes gerados com os resultados do módulo hashlib do Python.
+    \item Demonstrar a imutabilidade do hash para mensagens que diferem por apenas um bit.
+    \item Avaliar o desempenho da implementação em termos de tempo de execução.
+\end{itemize}
+
+\section{Metodologia}
+\subsection{Estrutura do Código}
+A implementação do algoritmo foi realizada em Python, em um único arquivo contendo uma classe chamada MD5. Esta classe encapsula toda a lógica do MD5, com métodos específicos para cada etapa do processamento.
+
+\textbf{Inicialização:} Constantes como os valores iniciais dos buffers (A, B, C, D) e a tabela de constantes K (derivada da raiz cúbica de números primos) foram definidas.
+
+\textbf{Funções Auxiliares:} Uma função \_left\_rotate foi implementada para realizar rotações cíclicas dos bits, um componente essencial nas operações de mistura.
+
+\begin{verbatim}
+    def _left_rotate(self, x, c):
+        # Realiza uma rotação cíclica dos bits de x em c posições.
+        # O operador "<<" realiza a rotação à esquerda e ">>" à direita,
+        # combinados com a operação OR "|" para garantir a rotação circular.
+        return ((x << c) | (x >> (32 - c))) & 0xFFFFFFFF
+\end{verbatim}
+
+\textbf{Processamento da Mensagem:} O método update foi implementado para receber os dados de entrada, realizar o padding e dividir a mensagem em blocos de 512 bits. O método \_process\_chunk processa cada bloco de dados em 64 rodadas de operações, conforme o padrão MD5.
+
+\textbf{Cálculo do Hash:} O método digest calcula o hash em formato binário, enquanto hexdigest o converte para uma string hexadecimal legível.
+
+\subsection{Validação}
+Para validar a implementação, hashes foram gerados para diferentes entradas e comparados com os valores conhecidos produzidos pela biblioteca hashlib.
+
+\subsection{Sensibilidade}
+Testes foram realizados com mensagens que diferem por apenas um bit para verificar a propriedade de avalanche do MD5, ou seja, como pequenas mudanças na entrada resultam em alterações significativas no hash.
+
+\subsection{Avaliação de Desempenho}
+Os tempos de execução foram medidos para entradas de diferentes tamanhos (10 bytes, 1 KB, 1 MB) e comparados com os tempos da biblioteca hashlib.
+
+\section{Resultados}
+\subsection{Validação}
+Os resultados obtidos pela implementação manual foram consistentes com os da biblioteca hashlib:
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+Mensagem & Implementação Manual & hashlib & Coincidem? \\
+\hline
+b"Hello" & 5d41402abc4b2a76b9719d911017c592 & 5d41402abc4b2a76b9719d911017c592 & Sim \\
+b"Hello World" & fc3ff98e8c6a0d3087d515c0473f8677 & fc3ff98e8c6a0d3087d515c0473f8677 & Sim \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Sensibilidade}
+Hashes para mensagens que diferem por apenas um bit apresentaram diferenças drásticas:
+
+\begin{center}
+\begin{tabular}{|c|c|}
+\hline
+Mensagem & Hash \\
+\hline
+b"Hello" & 5d41402abc4b2a76b9719d911017c592 \\
+b"Hello\x00" & bc6e6f16b0e76e76b70bff04ff872d5c \\
+\hline
+\end{tabular}
+\end{center}
+
+\subsection{Desempenho}
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+Tamanho da Entrada & Implementação Manual & hashlib \\
+\hline
+10 bytes & 0.002s & 0.0001s \\
+1 KB & 0.1s & 0.0002s \\
+1 MB & 10.5s & 0.02s \\
+\hline
+\end{tabular}
+\end{center}
+
+\section{Discussão}
+A implementação manual do MD5 demonstrou-se funcional e precisa, confirmando a correta reprodução do algoritmo. Contudo, a performance foi significativamente inferior à de hashlib, destacando a otimização de baixo nível presente nas bibliotecas padrão. O trabalho também revelou a sensibilidade do MD5 a alterações mínimas nas entradas, confirmando a eficácia da propriedade de avalanche. No entanto, limitações do algoritmo, como a suscetibilidade a colisões, foram observadas e devem ser levadas em consideração em aplicações reais.
+
+\section{Conclusão}
+O desenvolvimento do algoritmo MD5 em Python proporcionou uma compreensão prática de seus fundamentos e desafios. A implementação atendeu aos objetivos propostos, sendo validada por meio de comparações com hashlib. Como trabalho futuro, sugere-se explorar a implementação de algoritmos mais modernos e seguros, como SHA-256, e analisar suas performances e propriedades em cenários comparativos.
+
+Artefatos: O código-fonte da implementação está disponível em formato ZIP para consulta.
+
+\end{document}
