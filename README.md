@@ -12,3 +12,5 @@ Esse projeto é uma adaptação do algoritmo do md5 para python.
 | base | pasta com os arquivos do md5 em c | 
 | md5.py | algortimo desenvolvido em python por mim | 
 | md5_hashlib.py | algoritmo em python que usa hashlib para criar o md5 |
+| ietf.c | algoritmo e detalhes pela IETF
+| documentacao.txt | explicação em detalhes do funcionamento e implementação do código |

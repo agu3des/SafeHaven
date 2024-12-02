@@ -1,4 +1,4 @@
-Network Working Group                                          R. Rivest
+/*Network Working Group                                          R. Rivest
 Request for Comments: 1321           MIT Laboratory for Computer Science
                                              and RSA Data Security, Inc.
                                                               April 1992
@@ -201,7 +201,7 @@ RFC 1321              MD5 Message-Digest Algorithm            April 1992
    is equal to the integer part of 4294967296 times abs(sin(i)), where i
    is in radians. The elements of the table are given in the appendix.
 
-   Do the following:
+   Do the following:*/
 
    /* Process each 16-word block. */
    For i = 0 to N/16-1 do
@@ -214,14 +214,6 @@ RFC 1321              MD5 Message-Digest Algorithm            April 1992
      /* Save A as AA, B as BB, C as CC, and D as DD. */
      AA = A
      BB = B
-
-
-
-Rivest                                                          [Page 4]
-
-RFC 1321              MD5 Message-Digest Algorithm            April 1992
-
-
      CC = C
      DD = D
 
@@ -272,7 +264,7 @@ RFC 1321              MD5 Message-Digest Algorithm            April 1992
    end /* of loop on i */
 
 
-
+/*
 Rivest                                                          [Page 5]
 
 RFC 1321              MD5 Message-Digest Algorithm            April 1992
@@ -376,7 +368,7 @@ APPENDIX A - Reference Implementation
 
 A.1 global.h
 
-/* GLOBAL.H - RSAREF types and constants
+ GLOBAL.H - RSAREF types and constants
 */
 
 /* PROTOTYPES should be set to one if and only if the compiler supports
@@ -415,9 +407,9 @@ If using PROTOTYPES, then PROTO_LIST returns the list, otherwise it
 #define PROTO_LIST(list) ()
 #endif
 
-A.2 md5.h
 
-/* MD5.H - header file for MD5C.C
+/* A.2 md5.h
+MD5.H - header file for MD5C.C
 */
 
 /* Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
@@ -462,9 +454,9 @@ void MD5Update PROTO_LIST
   ((MD5_CTX *, unsigned char *, unsigned int));
 void MD5Final PROTO_LIST ((unsigned char [16], MD5_CTX *));
 
-A.3 md5c.c
+/* A.3 md5c.c
 
-/* MD5C.C - RSA Data Security, Inc., MD5 message-digest algorithm
+MD5C.C - RSA Data Security, Inc., MD5 message-digest algorithm
 */
 
 /* Copyright (C) 1991-2, RSA Data Security, Inc. Created 1991. All
@@ -493,13 +485,15 @@ documentation and/or software.
 #include "md5.h"
 
 /* Constants for MD5Transform routine.
- */
-
 
 
 Rivest                                                          [Page 9]
 
 RFC 1321              MD5 Message-Digest Algorithm            April 1992
+
+ */
+
+
 
 
 #define S11 7
@@ -550,14 +544,6 @@ Rotation is separate from addition to prevent recomputation.
 #define FF(a, b, c, d, x, s, ac) { \
  (a) += F ((b), (c), (d)) + (x) + (UINT4)(ac); \
  (a) = ROTATE_LEFT ((a), (s)); \
-
-
-
-Rivest                                                         [Page 10]
-
-RFC 1321              MD5 Message-Digest Algorithm            April 1992
-
-
  (a) += (b); \
   }
 #define GG(a, b, c, d, x, s, ac) { \
@@ -606,14 +592,6 @@ unsigned int inputLen;                     /* length of input block */
 
   /* Update number of bits */
   if ((context->count[0] += ((UINT4)inputLen << 3))
-
-
-
-Rivest                                                         [Page 11]
-
-RFC 1321              MD5 Message-Digest Algorithm            April 1992
-
-
    < ((UINT4)inputLen << 3))
  context->count[1]++;
   context->count[1] += ((UINT4)inputLen >> 29);
@@ -663,13 +641,6 @@ MD5_CTX *context;                                       /* context */
   /* Append length (before padding) */
   MD5Update (context, bits, 8);
 
-
-
-Rivest                                                         [Page 12]
-
-RFC 1321              MD5 Message-Digest Algorithm            April 1992
-
-
   /* Store state in digest */
   Encode (digest, context->state, 16);
 
@@ -718,14 +689,6 @@ unsigned char block[64];
   GG (a, b, c, d, x[ 9], S21, 0x21e1cde6); /* 25 */
   GG (d, a, b, c, x[14], S22, 0xc33707d6); /* 26 */
   GG (c, d, a, b, x[ 3], S23, 0xf4d50d87); /* 27 */
-
-
-
-Rivest                                                         [Page 13]
-
-RFC 1321              MD5 Message-Digest Algorithm            April 1992
-
-
   GG (b, c, d, a, x[ 8], S24, 0x455a14ed); /* 28 */
   GG (a, b, c, d, x[13], S21, 0xa9e3e905); /* 29 */
   GG (d, a, b, c, x[ 2], S22, 0xfcefa3f8); /* 30 */
@@ -772,17 +735,7 @@ RFC 1321              MD5 Message-Digest Algorithm            April 1992
   state[1] += b;
   state[2] += c;
   state[3] += d;
-
-  /* Zeroize sensitive information.
-
-
-
-Rivest                                                         [Page 14]
-
-RFC 1321              MD5 Message-Digest Algorithm            April 1992
-
-
-*/
+  
   MD5_memset ((POINTER)x, 0, sizeof (x));
 }
 
@@ -830,14 +783,6 @@ unsigned int len;
   unsigned int i;
 
   for (i = 0; i < len; i++)
-
-
-
-Rivest                                                         [Page 15]
-
-RFC 1321              MD5 Message-Digest Algorithm            April 1992
-
-
  output[i] = input[i];
 }
 
@@ -854,9 +799,9 @@ unsigned int len;
  ((char *)output)[i] = (char)value;
 }
 
-A.4 mddriver.c
+/* A.4 mddriver.c
 
-/* MDDRIVER.C - test driver for MD2, MD4 and MD5
+MDDRIVER.C - test driver for MD2, MD4 and MD5
  */
 
 /* Copyright (C) 1990-2, RSA Data Security, Inc. Created 1990. All
@@ -886,14 +831,6 @@ documentation and/or software.
 #include "md2.h"
 #endif
 #if MD == 4
-
-
-
-Rivest                                                         [Page 16]
-
-RFC 1321              MD5 Message-Digest Algorithm            April 1992
-
-
 #include "md4.h"
 #endif
 #if MD == 5
@@ -942,13 +879,6 @@ Arguments (may be any combination):
  */
 int main (argc, argv)
 int argc;
-
-
-
-Rivest                                                         [Page 17]
-
-RFC 1321              MD5 Message-Digest Algorithm            April 1992
-
 
 char *argv[];
 {
@@ -999,16 +929,7 @@ static void MDTimeTrial ()
   unsigned int i;
 
 
-
-
-Rivest                                                         [Page 18]
-
-RFC 1321              MD5 Message-Digest Algorithm            April 1992
-
-
-  printf
- ("MD%d time trial. Digesting %d %d-byte blocks ...", MD,
-  TEST_BLOCK_LEN, TEST_BLOCK_COUNT);
+  printf("MD%d time trial. Digesting %d %d-byte blocks ...", MD,TEST_BLOCK_LEN, TEST_BLOCK_COUNT);
 
   /* Initialize block */
   for (i = 0; i < TEST_BLOCK_LEN; i++)
@@ -1020,7 +941,7 @@ RFC 1321              MD5 Message-Digest Algorithm            April 1992
   /* Digest blocks */
   MDInit (&context);
   for (i = 0; i < TEST_BLOCK_COUNT; i++)
- MDUpdate (&context, block, TEST_BLOCK_LEN);
+  MDUpdate (&context, block, TEST_BLOCK_LEN);
   MDFinal (digest, &context);
 
   /* Stop timer */
@@ -1053,16 +974,6 @@ static void MDTestSuite ()
 1234567890123456789012345678901234567890");
 }
 
-/* Digests a file and prints the result.
-
-
-
-Rivest                                                         [Page 19]
-
-RFC 1321              MD5 Message-Digest Algorithm            April 1992
-
-
- */
 static void MDFile (filename)
 char *filename;
 {
@@ -1111,20 +1022,13 @@ static void MDPrint (digest)
 unsigned char digest[16];
 {
 
-
-
-Rivest                                                         [Page 20]
-
-RFC 1321              MD5 Message-Digest Algorithm            April 1992
-
-
   unsigned int i;
 
   for (i = 0; i < 16; i++)
  printf ("%02x", digest[i]);
 }
 
-A.5 Test suite
+/*A.5 Test suite
 
    The MD5 test suite (driver option "-x") should print the following
    results:
@@ -1146,7 +1050,7 @@ Security Considerations
    sufficient for implementing very high security hybrid digital-
    signature schemes based on MD5 and a public-key cryptosystem.
 
-Author's Address
+Author,s Address
 
    Ronald L. Rivest
    Massachusetts Institute of Technology
@@ -1158,15 +1062,4 @@ Author's Address
    Phone: (617) 253-5880
    EMail: rivest@theory.lcs.mit.edu
 
-
-
-
-
-
-
-
-
-
-
-
-Rivest                                                         [Page 21]
+Rivest                                                         [Page 21]*/

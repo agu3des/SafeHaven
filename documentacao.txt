@@ -1,0 +1,68 @@
+Este código implementa o algoritmo de MD5 em Python. 
+O MD5 (Message Digest Algorithm 5) é um algoritmo de hash criptográfico que gera um valor fixo de 128 bits (16 bytes) a partir de uma entrada de qualquer tamanho. 
+
+1. Estrutura da Classe MD5
+    A classe MD5 encapsula todos os detalhes do cálculo do hash MD5, incluindo as funções auxiliares e os valores de estado.
+    1.1 Atributos
+        _s: Lista de deslocamentos cíclicos (shifts) usados em cada uma das 64 etapas do algoritmo. Esses valores são fixados pelo padrão MD5.
+        _k: Constantes derivadas das raízes cúbicas dos números primos. Cada constante é calculada como: k[i]=int((232)×∣sin⁡(i+1)∣)k[i] = \text{int}((2^{32}) \times |\sin(i + 1)|)
+        _buffers: Os quatro buffers de estado inicial do MD5, que são constantes fixas:
+        A = 0x67452301
+        B = 0xEFCDAB89
+        C = 0x98BADCFE
+        D = 0x10325476
+        _original_len: Tamanho total dos dados processados, armazenado em bits.
+        _buffer: Armazena blocos de 64 bytes (512 bits) para processamento. Se a entrada for menor que 64 bytes, ela é mantida aqui até ser preenchida.
+
+2. Métodos
+    2.1 _left_rotate(x, c)
+        Executa uma rotação à esquerda (bitwise) no número x por c posições. É uma operação fundamental no MD5 para garantir a mistura dos bits.
+        return ((x << c) | (x >> (32 - c))) & 0xFFFFFFFF
+
+    2.2 update(input_bytes)
+        Este método recebe dados (input_bytes) e os adiciona ao buffer. Sempre que o buffer acumula 64 bytes, o método chama _process_chunk para processá-los.
+        while len(self._buffer) >= 64:
+            self._process_chunk(self._buffer[:64])
+            self._buffer = self._buffer[64:]
+
+    2.3 _process_chunk(chunk)
+        Este método realiza o cálculo principal do MD5, processando um bloco de 64 bytes.
+        Entrada: Um bloco de 64 bytes.
+        Saída: Atualiza os quatro buffers (A, B, C, D) com os resultados do bloco processado.
+        Etapas Internas:
+        Decodifica o bloco de 64 bytes em 16 inteiros de 32 bits (usando struct.unpack).
+        Executa 64 iterações divididas em 4 etapas principais:
+        Etapa 1: Operação (b & c) | (~b & d).
+        Etapa 2: Operação (d & b) | (~d & c).
+        Etapa 3: Operação b ^ c ^ d.
+        Etapa 4: Operação c ^ (b | ~d).
+        Atualiza os buffers usando as operações matemáticas e de rotação.
+    2.4 digest()
+        Gera o hash MD5 final.
+        Adiciona Padding: Conforme o padrão MD5:
+        Adiciona o byte 0x80.
+        Preenche com bytes 0x00 até que o comprimento seja congruente a 56 bytes modulo 64.
+        Adiciona o Comprimento: Insere o comprimento total original dos dados (em bits) como um valor de 64 bits (8 bytes).
+        Processa o Último Bloco: Atualiza os buffers.
+        Retorna o hash como uma sequência de 16 bytes.
+    2.5 hexdigest()
+        Retorna o hash no formato hexadecimal (32 caracteres).
+
+3. Exemplo de Uso
+    data = b"Hello World"
+    md5 = MD5()
+    md5.update(data)
+    print(md5.hexdigest())
+
+    Entrada: b"Hello World".
+    Saída: O valor hexadecimal do hash MD5 da entrada, que deve ser:
+    b10a8db164e0754105b7a99be72e3fe5
+
+
+
+4. Resumindo o Funcionamento
+    O algoritmo divide os dados em blocos de 64 bytes.
+    Cada bloco é processado em 64 etapas que utilizam operações bitwise, soma modular e rotações.
+    Após processar todos os blocos, adiciona-se padding e o comprimento original dos dados.
+    O resultado final é um hash de 128 bits, representado em 32 caracteres hexadecimais.
+
