@@ -1,5 +1,7 @@
 \documentclass{article}
-\usepackage{graphicx} % Required for inserting images
+\usepackage{listings}
+\usepackage[utf8]{inputenc}
+
 
 \title{Relatório Científico: Implementação do Algoritmo MD5 em Python}
 \author{Ananda Guedes do Ó}
@@ -30,32 +32,74 @@ Os principais objetivos deste trabalho incluem:
 
 \section{Metodologia}
 \subsection{Estrutura do Código}
-A implementação do algoritmo foi realizada em Python, em um único arquivo contendo uma classe chamada MD5. Esta classe encapsula toda a lógica do MD5, com métodos específicos para cada etapa do processamento.
+A implementação do algoritmo MD5 foi realizada em Python e organizada em uma única classe, chamada \texttt{MD5}, que encapsula todo o processo de hash. A classe implementa todas as etapas do algoritmo, incluindo a inicialização, o preenchimento (padding), o processamento da mensagem em blocos, as operações de mistura e o cálculo do hash final.
 
-\textbf{Inicialização:} Constantes como os valores iniciais dos buffers (A, B, C, D) e a tabela de constantes K (derivada da raiz cúbica de números primos) foram definidas.
+\textbf{1. Inicialização} A primeira etapa da implementação envolve a definição de constantes essenciais para o funcionamento do MD5. Isso inclui os valores iniciais dos buffers $A$, $B$, $C$ e $D$, que são os registradores do algoritmo, bem como a tabela de constantes $K$, que são derivadas da parte fracionária da raiz cúbica de números primos. Essas constantes são usadas nas funções de mistura (as operações que alteram os valores dos registradores).
 
-\textbf{Funções Auxiliares:} Uma função \_left\_rotate foi implementada para realizar rotações cíclicas dos bits, um componente essencial nas operações de mistura.
+Além disso, é feita a inicialização de variáveis que irão conter os dados de entrada, os resultados intermediários e o hash final.
 
-\begin{verbatim}
-    def _left_rotate(self, x, c):
-        # Realiza uma rotação cíclica dos bits de x em c posições.
-        # O operador "<<" realiza a rotação à esquerda e ">>" à direita,
-        # combinados com a operação OR "|" para garantir a rotação circular.
-        return ((x << c) | (x >> (32 - c))) & 0xFFFFFFFF
-\end{verbatim}
+\textbf{2. Funções Auxiliares} 
+O MD5 utiliza uma operação crucial chamada rotação cíclica de bits. Para isso, a implementação inclui uma função chamada \texttt{\_left\_rotate}
+, que realiza a rotação de um número de 32 bits para a esquerda. Esta função é fundamental nas operações de mistura, pois permite o embaralhamento dos dados de forma que pequenas alterações no texto de entrada resultem em mudanças drásticas no hash final.
 
-\textbf{Processamento da Mensagem:} O método update foi implementado para receber os dados de entrada, realizar o padding e dividir a mensagem em blocos de 512 bits. O método \_process\_chunk processa cada bloco de dados em 64 rodadas de operações, conforme o padrão MD5.
+Aqui está o código dessa função:
 
-\textbf{Cálculo do Hash:} O método digest calcula o hash em formato binário, enquanto hexdigest o converte para uma string hexadecimal legível.
+\begin{lstlisting}[language=Python]
+def _left_rotate(self, x, c):
+     #Realiza uma rotação cíclica dos bits de x em c posições.
+     #O operador "<<" realiza a rotação à esquerda e ">>" à direita,
+     #combinados com a operação OR "|" para garantir a rotação circular.
+    return ((x << c) | (x >> (32 - c))) & 0xFFFFFFFF
+\end{lstlisting}
+
+Este código faz uso de operações de deslocamento à esquerda (<<) e à direita (>>) para realizar a rotação circular. O operador OR ("|") é usado para combinar as partes do número que "saem" e "entram" durante a rotação, garantindo que os bits que saem por uma extremidade retornem pela outra.
+
+\textbf{3. Preenchimento (Padding) e Divisão em Blocos} 
+Antes de processar os dados, o MD5 exige que a mensagem de entrada seja ajustada para um múltiplo de 512 bits. Isso é feito através de um processo de preenchimento, que adiciona bits para garantir que o comprimento da mensagem seja adequado.
+
+Adicionar um bit 1 (0x80): O primeiro passo do preenchimento é adicionar um bit 1 à mensagem original. 
+Adicionar zeros: Em seguida, adiciona-se um número suficiente de zeros para que o comprimento da mensagem seja 64 bits a menos do que um múltiplo de 512.
+Adicionar o comprimento original da mensagem: Finalmente, o comprimento original da mensagem (antes do preenchimento) é anexado aos 64 bits finais da mensagem. O comprimento é dado em bits. 
+O método \texttt{update} é responsável por realizar essas transformações, e o método \texttt{\_process\_chunk} divide a mensagem em blocos de 512 bits. Cada bloco é processado individualmente através das operações de mistura.
+
+\textbf{4. Processamento dos Blocos} 
+O processamento de cada bloco de 512 bits é feito através de 64 rodadas de operações, divididas em 4 grupos de 16. Cada rodada usa uma operação não linear (como AND, OR, XOR) combinada com uma constante específica da tabela $K$ e uma função auxiliar. A operação de mistura é o principal componente que altera os valores dos registradores $A$, $B$, $C$, e $D$.
+
+O processamento das mensagens ocorre da seguinte forma:
+
+\begin{itemize}
+    \item \textbf{Divisão da Mensagem:} Cada bloco de 512 bits é dividido em 16 palavras de 32 bits.
+    \item \textbf{Execução das Operações de Mistura:} A cada rodada, um dos quatro registradores ($A$, $B$, $C$, $D$) é alterado com base nas palavras do bloco, em uma operação que envolve:
+    \begin{itemize}
+        \item A aplicação de uma função não linear para combinar as palavras.
+        \item A rotação dos bits do registrador.
+        \item A adição de constantes e valores da tabela $K$.
+    \end{itemize}
+\end{itemize}
+
+\textbf{5. Cálculo do Hash Final} 
+Após o processamento de todos os blocos, os valores finais de $A$, $B$, $C$ e $D$ são concatenados para formar o hash final de 128 bits. O método \texttt{digest} converte o hash em formato binário, enquanto o método \texttt{hexdigest} o converte para uma string hexadecimal legível.
+
+O código final que gera o hash pode ser mostrado da seguinte forma:
+
+\begin{lstlisting}[language=Python]
+    def digest(self):
+        # Retorna o valor do hash final, concatenando os valores de A, B, C e D
+        return struct.pack('I', self.A) + struct.pack('I', self.B) + struct.pack('I', self.C) + struct.pack('I', self.D)
+    
+    def hexdigest(self):
+        # Retorna o hash final em formato hexadecimal
+        return ''.join('%02x' % b for b in self.digest())
+\end{lstlisting}
 
 \subsection{Validação}
-Para validar a implementação, hashes foram gerados para diferentes entradas e comparados com os valores conhecidos produzidos pela biblioteca hashlib.
+A implementação foi validada por meio da comparação dos hashes gerados para mensagens de teste com os valores conhecidos gerados pela biblioteca hashlib do Python. Para garantir que a implementação fosse correta, as mensagens "Hello" e "Hello World" foram processadas, e os resultados obtidos com a implementação manual foram comparados com os resultados da função \texttt{md5} de hashlib.
 
 \subsection{Sensibilidade}
-Testes foram realizados com mensagens que diferem por apenas um bit para verificar a propriedade de avalanche do MD5, ou seja, como pequenas mudanças na entrada resultam em alterações significativas no hash.
+Foi testada a sensibilidade do algoritmo MD5 para mensagens que diferem por apenas um bit. Isso é conhecido como a "propriedade de avalanche", que implica que mudanças pequenas na entrada resultam em grandes mudanças no hash. Como esperado, a diferença de apenas um byte entre "Hello" e "Hello\x00" produziu hashes completamente diferentes.
 
 \subsection{Avaliação de Desempenho}
-Os tempos de execução foram medidos para entradas de diferentes tamanhos (10 bytes, 1 KB, 1 MB) e comparados com os tempos da biblioteca hashlib.
+O desempenho da implementação foi avaliado medindo o tempo de execução para diferentes tamanhos de entrada (10 bytes, 1 KB e 1 MB) e comparando-o com a função \texttt{md5} da biblioteca hashlib. Como esperado, a implementação manual foi significativamente mais lenta que a versão otimizada da biblioteca.
 
 \section{Resultados}
 \subsection{Validação}
