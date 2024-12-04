@@ -1,5 +1,5 @@
-# ProjetoSeguranca
-Esse projeto é uma adaptação do algoritmo do md5 para python. 
+# SafeHaven
+Esse projeto é uma adaptação do algoritmo do md5 para python, projetado para a disciplina de Segurança de Dados. 
 
 ## Estudos
 - Repositório em C: https://github.com/pantsman0/md5/blob/master/md5c.c 
