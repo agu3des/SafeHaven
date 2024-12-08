@@ -1,154 +1,137 @@
 \documentclass{article}
-\usepackage{listings}
 \usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+\usepackage{amsfonts}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{longtable}
 
-
-\title{Relatório Científico: Implementação do Algoritmo MD5 em Python}
+\title{Implementação do Algoritmo MD5 em Python}
 \author{Ananda Guedes do Ó}
-\date{December 2024}
+\date{Dezembro de 2024}
 
 \begin{document}
 
 \maketitle
 
-\section{Introdução}
-O algoritmo MD5 (Message-Digest Algorithm 5) é um dos métodos de hash mais conhecidos e amplamente utilizados na verificação de integridade de dados e autenticação. Apesar de suas vulnerabilidades conhecidas, como suscetibilidade a colisões, ele ainda é relevante como ferramenta educacional para estudar conceitos fundamentais de hashing e criptografia. Este artigo apresenta a implementação do algoritmo MD5 em Python, explorando suas etapas principais e analisando os resultados obtidos. O objetivo é implementar o algoritmo MD5 de forma manual, compreender seu funcionamento e validar os resultados comparando-os com os valores gerados por bibliotecas padrões, como hashlib. Além disso, o trabalho busca demonstrar a sensibilidade do MD5 a pequenas alterações nas entradas e avaliar o desempenho da implementação.
+\section*{Introdução}
 
-\section{Objetivos}
-Os principais objetivos deste trabalho incluem:
+O algoritmo MD5 (Message-Digest Algorithm 5) é amplamente utilizado para verificar a integridade de dados, sendo um dos métodos de hash mais conhecidos. Apesar das vulnerabilidades conhecidas, como a suscetibilidade a colisões, o MD5 ainda possui relevância educacional para estudar conceitos fundamentais de hashing e criptografia. Este trabalho apresenta a implementação do algoritmo MD5 em Python, detalhando suas etapas principais e realizando uma análise comparativa entre os resultados gerados manualmente e os gerados pela biblioteca hashlib. Além disso, este estudo investiga a sensibilidade do MD5 a pequenas modificações nas entradas e avalia o desempenho da implementação.
+
+\section*{Objetivos}
+
+O principal objetivo deste trabalho é desenvolver uma implementação do algoritmo MD5 em Python, abordando as seguintes metas específicas:
+
 \begin{itemize}
-    \item Desenvolver uma implementação do algoritmo MD5 em Python, respeitando todas as etapas teóricas, incluindo:
+    \item Implementar o algoritmo MD5 manualmente, respeitando as etapas teóricas descritas no funcionamento do MD5:
     \begin{itemize}
-        \item Preenchimento (padding).
-        \item Anexação do tamanho original.
-        \item Divisão da mensagem em blocos de 512 bits.
-        \item Processamento dos blocos com as operações de mistura.
-        \item Cálculo do hash final.
+        \item Preenchimento (Padding): Adicionar bits de preenchimento e o tamanho original da mensagem.
+        \item Divisão em Blocos: Dividir a mensagem em blocos de 512 bits.
+        \item Processamento dos Blocos: Realizar as operações de mistura para cada bloco.
+        \item Cálculo do Hash Final: Concatenar os valores dos registradores para gerar o hash de 128 bits.
     \end{itemize}
-    \item Validar a implementação comparando os hashes gerados com os resultados do módulo hashlib do Python.
-    \item Demonstrar a imutabilidade do hash para mensagens que diferem por apenas um bit.
+    \item Validar a implementação, comparando os hashes gerados com a função hashlib do Python.
+    \item Demonstrar a imutabilidade do hash, observando mudanças drásticas com alterações mínimas nas entradas (propriedade de avalanche).
     \item Avaliar o desempenho da implementação em termos de tempo de execução.
 \end{itemize}
 
-\section{Metodologia}
-\subsection{Estrutura do Código}
-A implementação do algoritmo MD5 foi realizada em Python e organizada em uma única classe, chamada \texttt{MD5}, que encapsula todo o processo de hash. A classe implementa todas as etapas do algoritmo, incluindo a inicialização, o preenchimento (padding), o processamento da mensagem em blocos, as operações de mistura e o cálculo do hash final.
+\section*{Metodologia}
 
-\textbf{1. Inicialização} A primeira etapa da implementação envolve a definição de constantes essenciais para o funcionamento do MD5. Isso inclui os valores iniciais dos buffers $A$, $B$, $C$ e $D$, que são os registradores do algoritmo, bem como a tabela de constantes $K$, que são derivadas da parte fracionária da raiz cúbica de números primos. Essas constantes são usadas nas funções de mistura (as operações que alteram os valores dos registradores).
+\subsection*{Estrutura do Código}
 
-Além disso, é feita a inicialização de variáveis que irão conter os dados de entrada, os resultados intermediários e o hash final.
+A implementação do algoritmo MD5 foi organizada em uma classe Python chamada MD5. Essa classe encapsula o processo completo de hashing, que inclui todas as etapas desde a inicialização até o cálculo final do hash. A estrutura da classe é descrita a seguir.
 
-\textbf{2. Funções Auxiliares} 
-O MD5 utiliza uma operação crucial chamada rotação cíclica de bits. Para isso, a implementação inclui uma função chamada \texttt{\_left\_rotate}
-, que realiza a rotação de um número de 32 bits para a esquerda. Esta função é fundamental nas operações de mistura, pois permite o embaralhamento dos dados de forma que pequenas alterações no texto de entrada resultem em mudanças drásticas no hash final.
+\subsubsection*{1. Inicialização}
 
-Aqui está o código dessa função:
+A inicialização do MD5 define as constantes essenciais para o funcionamento do algoritmo:
+
+\begin{itemize}
+    \item Buffers Iniciais: O MD5 utiliza quatro registradores AA, BB, CC e DD, com valores iniciais específicos.
+    \item Tabela de Constantes (K): Cada uma das 64 rodadas do MD5 usa um valor da tabela K, derivada da parte fracionária da raiz cúbica dos primeiros 64 números primos.
+\end{itemize}
+
+\subsubsection*{2. Função de Rotação Cíclica}
+
+O MD5 faz uso da rotação cíclica de bits em suas operações de mistura. A função \texttt{\_left\_rotate} implementa essa rotação, deslocando os bits de um número para a esquerda de forma circular:
 
 \begin{lstlisting}[language=Python]
 def _left_rotate(self, x, c):
-     #Realiza uma rotação cíclica dos bits de x em c posições.
-     #O operador "<<" realiza a rotação à esquerda e ">>" à direita,
-     #combinados com a operação OR "|" para garantir a rotação circular.
+    # Realiza uma rotação cíclica dos bits de x em c posições.
     return ((x << c) | (x >> (32 - c))) & 0xFFFFFFFF
 \end{lstlisting}
 
-Este código faz uso de operações de deslocamento à esquerda (<<) e à direita (>>) para realizar a rotação circular. O operador OR ("|") é usado para combinar as partes do número que "saem" e "entram" durante a rotação, garantindo que os bits que saem por uma extremidade retornem pela outra.
+\subsubsection*{3. Preenchimento e Divisão em Blocos}
 
-\textbf{3. Preenchimento (Padding) e Divisão em Blocos} 
-Antes de processar os dados, o MD5 exige que a mensagem de entrada seja ajustada para um múltiplo de 512 bits. Isso é feito através de um processo de preenchimento, que adiciona bits para garantir que o comprimento da mensagem seja adequado.
+O processo de preenchimento (padding) adiciona um bit 1 seguido de bits 0 até que o comprimento total da mensagem seja congruente a 448, módulo 512. Após o preenchimento, adiciona-se o comprimento original da mensagem em bits como um valor de 64 bits. A mensagem é então dividida em blocos de 512 bits, que são processados individualmente.
 
-Adicionar um bit 1 (0x80): O primeiro passo do preenchimento é adicionar um bit 1 à mensagem original. 
-Adicionar zeros: Em seguida, adiciona-se um número suficiente de zeros para que o comprimento da mensagem seja 64 bits a menos do que um múltiplo de 512.
-Adicionar o comprimento original da mensagem: Finalmente, o comprimento original da mensagem (antes do preenchimento) é anexado aos 64 bits finais da mensagem. O comprimento é dado em bits. 
-O método \texttt{update} é responsável por realizar essas transformações, e o método \texttt{\_process\_chunk} divide a mensagem em blocos de 512 bits. Cada bloco é processado individualmente através das operações de mistura.
+\subsubsection*{4. Processamento dos Blocos}
 
-\textbf{4. Processamento dos Blocos} 
-O processamento de cada bloco de 512 bits é feito através de 64 rodadas de operações, divididas em 4 grupos de 16. Cada rodada usa uma operação não linear (como AND, OR, XOR) combinada com uma constante específica da tabela $K$ e uma função auxiliar. A operação de mistura é o principal componente que altera os valores dos registradores $A$, $B$, $C$, e $D$.
+Cada bloco de 512 bits é processado em 64 rodadas, usando funções de mistura e constantes derivadas. As operações realizadas são não lineares e envolvem a rotação cíclica, realizando modificações nos registradores AA, BB, CC e DD a cada rodada.
 
-O processamento das mensagens ocorre da seguinte forma:
+\subsubsection*{5. Cálculo do Hash Final}
 
-\begin{itemize}
-    \item \textbf{Divisão da Mensagem:} Cada bloco de 512 bits é dividido em 16 palavras de 32 bits.
-    \item \textbf{Execução das Operações de Mistura:} A cada rodada, um dos quatro registradores ($A$, $B$, $C$, $D$) é alterado com base nas palavras do bloco, em uma operação que envolve:
-    \begin{itemize}
-        \item A aplicação de uma função não linear para combinar as palavras.
-        \item A rotação dos bits do registrador.
-        \item A adição de constantes e valores da tabela $K$.
-    \end{itemize}
-\end{itemize}
+Ao final do processamento de todos os blocos, os valores finais de AA, BB, CC e DD são somados aos valores anteriores dos buffers. O resultado final é o hash de 128 bits.
 
-\textbf{5. Cálculo do Hash Final} 
-Após o processamento de todos os blocos, os valores finais de $A$, $B$, $C$ e $D$ são concatenados para formar o hash final de 128 bits. O método \texttt{digest} converte o hash em formato binário, enquanto o método \texttt{hexdigest} o converte para uma string hexadecimal legível.
+\section*{Resultados}
 
-O código final que gera o hash pode ser mostrado da seguinte forma:
+\subsection*{Validação}
 
-\begin{lstlisting}[language=Python]
-    def digest(self):
-        # Retorna o valor do hash final, concatenando os valores de A, B, C e D
-        return struct.pack('I', self.A) + struct.pack('I', self.B) + struct.pack('I', self.C) + struct.pack('I', self.D)
-    
-    def hexdigest(self):
-        # Retorna o hash final em formato hexadecimal
-        return ''.join('%02x' % b for b in self.digest())
-\end{lstlisting}
+Os resultados da implementação manual foram comparados com os valores gerados pela biblioteca hashlib do Python. A tabela a seguir mostra os valores de hash gerados para diferentes entradas:
 
-\subsection{Validação}
-A implementação foi validada por meio da comparação dos hashes gerados para mensagens de teste com os valores conhecidos gerados pela biblioteca hashlib do Python. Para garantir que a implementação fosse correta, as mensagens "Hello" e "Hello World" foram processadas, e os resultados obtidos com a implementação manual foram comparados com os resultados da função \texttt{md5} de hashlib.
-
-\subsection{Sensibilidade}
-Foi testada a sensibilidade do algoritmo MD5 para mensagens que diferem por apenas um bit. Isso é conhecido como a "propriedade de avalanche", que implica que mudanças pequenas na entrada resultam em grandes mudanças no hash. Como esperado, a diferença de apenas um byte entre "Hello" e "Hello\x00" produziu hashes completamente diferentes.
-
-\subsection{Avaliação de Desempenho}
-O desempenho da implementação foi avaliado medindo o tempo de execução para diferentes tamanhos de entrada (10 bytes, 1 KB e 1 MB) e comparando-o com a função \texttt{md5} da biblioteca hashlib. Como esperado, a implementação manual foi significativamente mais lenta que a versão otimizada da biblioteca.
-
-\section{Resultados}
-\subsection{Validação}
-Os resultados obtidos pela implementação manual foram consistentes com os da biblioteca hashlib:
-
-\begin{center}
-\begin{tabular}{|c|c|c|c|}
+\begin{longtable}{|l|l|l|l|}
 \hline
-Mensagem & Implementação Manual & hashlib & Coincidem? \\
+\textbf{Método} & \textbf{Mensagem} & \textbf{Hash} & \textbf{Coincidem?} \\
 \hline
-b"Hello" & 5d41402abc4b2a76b9719d911017c592 & 5d41402abc4b2a76b9719d911017c592 & Sim \\
-b"Hello World" & fc3ff98e8c6a0d3087d515c0473f8677 & fc3ff98e8c6a0d3087d515c0473f8677 & Sim \\
+\endfirsthead
 \hline
-\end{tabular}
-\end{center}
+Manual & b"Hello World" & b10a8db164e0754105b7a99be72e3fe5 & Sim \\
+\hline
+Hashlib & "Hello World" & b10a8db164e0754105b7a99be72e3fe5 & Sim \\
+\hline
+\end{longtable}
 
-\subsection{Sensibilidade}
-Hashes para mensagens que diferem por apenas um bit apresentaram diferenças drásticas:
+\subsection*{Sensibilidade}
 
-\begin{center}
-\begin{tabular}{|c|c|}
+Alterações mínimas na entrada resultaram em grandes mudanças no hash, confirmando a propriedade de avalanche do MD5. A tabela a seguir ilustra esse comportamento:
+
+\begin{longtable}{|l|l|}
 \hline
-Mensagem & Hash \\
+\textbf{Mensagem} & \textbf{Hash} \\
+\hline
+\endfirsthead
 \hline
 b"Hello" & 5d41402abc4b2a76b9719d911017c592 \\
-b"Hello\x00" & bc6e6f16b0e76e76b70bff04ff872d5c \\
 \hline
-\end{tabular}
-\end{center}
-
-\subsection{Desempenho}
-\begin{center}
-\begin{tabular}{|c|c|c|}
+b"Hello00" & bc6e6f16b0e76e76b70bff04ff872d5c \\
 \hline
-Tamanho da Entrada & Implementação Manual & hashlib \\
-\hline
-10 bytes & 0.002s & 0.0001s \\
-1 KB & 0.1s & 0.0002s \\
-1 MB & 10.5s & 0.02s \\
-\hline
-\end{tabular}
-\end{center}
+\end{longtable}
 
-\section{Discussão}
-A implementação manual do MD5 demonstrou-se funcional e precisa, confirmando a correta reprodução do algoritmo. Contudo, a performance foi significativamente inferior à de hashlib, destacando a otimização de baixo nível presente nas bibliotecas padrão. O trabalho também revelou a sensibilidade do MD5 a alterações mínimas nas entradas, confirmando a eficácia da propriedade de avalanche. No entanto, limitações do algoritmo, como a suscetibilidade a colisões, foram observadas e devem ser levadas em consideração em aplicações reais.
+\section*{Discussão}
 
-\section{Conclusão}
-O desenvolvimento do algoritmo MD5 em Python proporcionou uma compreensão prática de seus fundamentos e desafios. A implementação atendeu aos objetivos propostos, sendo validada por meio de comparações com hashlib. Como trabalho futuro, sugere-se explorar a implementação de algoritmos mais modernos e seguros, como SHA-256, e analisar suas performances e propriedades em cenários comparativos.
+Durante a implementação manual do algoritmo MD5, surgiram diversos desafios técnicos que exigem uma boa compreensão dos detalhes do funcionamento do algoritmo e da matemática envolvida. Entre os principais desafios, destacam-se:
 
-Artefatos: O código-fonte da implementação está disponível em formato ZIP para consulta.
+\begin{itemize}
+    \item Tratamento de Erros e Exceções
+    \item Compreensão dos Detalhes Matemáticos
+    \item Desempenho e Eficiência
+\end{itemize}
+
+\section*{Conclusão}
+
+A implementação manual do algoritmo MD5 foi um exercício educativo valioso, permitindo uma compreensão aprofundada dos detalhes técnicos e matemáticos envolvidos no funcionamento do algoritmo de hash. A implementação foi validada com sucesso ao gerar hashes que coincidem com os valores produzidos pela biblioteca hashlib, demonstrando a exatidão do processo. A propriedade de "avalanche", onde pequenas mudanças na entrada resultam em grandes diferenças no hash, foi claramente observada, o que reforça a sensibilidade do algoritmo a alterações mínimas.
+
+No entanto, ao comparar a implementação manual com a versão otimizada da hashlib, ficou claro que a solução manual não é eficiente em termos de desempenho. A execução de operações bit a bit repetitivas, somada à necessidade de tratamentos de erro e ao manuseio detalhado de dados, torna a versão manual mais lenta, especialmente quando processa grandes volumes de dados.
+
+A principal limitação do MD5 é sua vulnerabilidade a colisões, o que o torna inadequado para aplicações que exigem alta segurança.
+
+\section*{Referências}
+
+\begin{itemize}
+    \item IETF. RFC 1321 - MD5 Message-Digest Algorithm. Abril de 1992. Disponível em: \url{https://www.ietf.org/rfc/rfc1321.txt}. Acesso em: 30 nov. 2024.
+    \item PANTSMAN0. Código base dividido em arquivos C. Disponível em: \url{https://github.com/pantsman0/md5/blob/master/md5c.c}. Acesso em: 1 dez. 2024.
+    \item KINSTA. Utilizando hash em Python. Disponível em: \url{https://kinsta.com/pt/blog/hashing-python/}. Acesso em: 28 nov. 2024.
+    \item OVERLEAF. Plataforma para gerar o relatório SBC. Disponível em: \url{https://pt.overleaf.com/latex/templates/sbc-conferences-template/blbxwjwzdngr}. Acesso em: 5 dez. 2024.
+\end{itemize}
 
 \end{document}

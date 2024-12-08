@@ -1,0 +1,94 @@
+Implementação do Algoritmo MD5 em Python
+ Autor: Ananda Guedes do Ó
+ Data: Dezembro de 2024
+Introdução
+O algoritmo MD5 (Message-Digest Algorithm 5) é amplamente utilizado para verificar a integridade de dados, sendo um dos métodos de hash mais conhecidos. Apesar das vulnerabilidades conhecidas, como a suscetibilidade a colisões, o MD5 ainda possui relevância educacional para estudar conceitos fundamentais de hashing e criptografia. Este trabalho apresenta a implementação do algoritmo MD5 em Python, detalhando suas etapas principais e realizando uma análise comparativa entre os resultados gerados manualmente e os gerados pela biblioteca hashlib. Além disso, este estudo investiga a sensibilidade do MD5 a pequenas modificações nas entradas e avalia o desempenho da implementação.
+Objetivos
+O principal objetivo deste trabalho é desenvolver uma implementação do algoritmo MD5 em Python, abordando as seguintes metas específicas:
+Implementar o algoritmo MD5 manualmente, respeitando as etapas teóricas descritas no funcionamento do MD5:
+
+
+Preenchimento (Padding): Adicionar bits de preenchimento e o tamanho original da mensagem.
+Divisão em Blocos: Dividir a mensagem em blocos de 512 bits.
+Processamento dos Blocos: Realizar as operações de mistura para cada bloco.
+Cálculo do Hash Final: Concatenar os valores dos registradores para gerar o hash de 128 bits.
+Validar a implementação, comparando os hashes gerados com a função hashlib do Python.
+
+
+Demonstrar a imutabilidade do hash, observando mudanças drásticas com alterações mínimas nas entradas (propriedade de avalanche).
+
+
+Avaliar o desempenho da implementação em termos de tempo de execução.
+
+
+Metodologia
+Estrutura do Código
+A implementação do algoritmo MD5 foi organizada em uma classe Python chamada MD5. Essa classe encapsula o processo completo de hashing, que inclui todas as etapas desde a inicialização até o cálculo final do hash. A estrutura da classe é descrita a seguir.
+1. Inicialização
+A inicialização do MD5 define as constantes essenciais para o funcionamento do algoritmo:
+Buffers Iniciais: O MD5 utiliza quatro registradores AA, BB, CC e DD, com valores iniciais específicos.
+
+
+Tabela de Constantes (K): Cada uma das 64 rodadas do MD5 usa um valor da tabela KK, derivada da parte fracionária da raiz cúbica dos primeiros 64 números primos.
+
+
+2. Função de Rotação Cíclica
+O MD5 faz uso da rotação cíclica de bits em suas operações de mistura. A função _left_rotate implementa essa rotação, deslocando os bits de um número para a esquerda de forma circular:
+def _left_rotate(self, x, c):
+    # Realiza uma rotação cíclica dos bits de x em c posições.
+    return ((x << c) | (x >> (32 - c))) & 0xFFFFFFFF
+3. Preenchimento e Divisão em Blocos
+O processo de preenchimento (padding) adiciona um bit 1 seguido de bits 0 até que o comprimento total da mensagem seja congruente a 448, módulo 512. Após o preenchimento, adiciona-se o comprimento original da mensagem em bits como um valor de 64 bits.
+A mensagem é então dividida em blocos de 512 bits, que são processados individualmente.
+4. Processamento dos Blocos
+Cada bloco de 512 bits é processado em 64 rodadas, usando funções de mistura e constantes derivadas. As operações realizadas são não lineares e envolvem a rotação cíclica, realizando modificações nos registradores AA, BB, CC e DD a cada rodada.
+5. Cálculo do Hash Final
+Ao final do processamento de todos os blocos, os valores finais de AA, BB, CC e DD são somados aos valores anteriores dos buffers. O resultado final é o hash de 128 bits.
+Resultados
+Validação
+Os resultados da implementação manual foram comparados com os valores gerados pela biblioteca hashlib do Python. A tabela a seguir mostra os valores de hash gerados para diferentes entradas:
+Método
+Manual
+Hashlib
+Mensagem
+b"Hello World"
+"Hello World"
+Hash
+b10a8db164e0754105b7a99be72e3fe5
+b10a8db164e0754105b7a99be72e3fe5
+Tempo
+0.002316713333129883 segundos
+0.0011930465698242188 segundos
+Coincidem?
+Sim
+Sim
+
+Sensibilidade
+Alterações mínimas na entrada resultaram em grandes mudanças no hash, confirmando a propriedade de avalanche do MD5. A tabela a seguir ilustra esse comportamento:
+Mensagem
+Hash
+b"Hello"
+5d41402abc4b2a76b9719d911017c592
+b"Hello00"
+bc6e6f16b0e76e76b70bff04ff872d5c
+
+Discussão
+Durante a implementação manual do algoritmo MD5, surgiram diversos desafios técnicos que exigem uma boa compreensão dos detalhes do funcionamento do algoritmo e da matemática envolvida. Entre os principais desafios, destacam-se:
+Tratamento de Erros e Exceções: O MD5 é um algoritmo complexo, com várias operações matemáticas e bit a bit. Garantir que todos os cálculos fossem realizados corretamente, sem erros de overflow ou manipulação inadequada de bits, foi um desafio. O principal cuidado foi com a rotação de bits e a aplicação das funções não lineares, que são essenciais para o bom funcionamento do algoritmo. Durante os testes, foi necessário ajustar os tratamentos de exceções para garantir que os valores de 32 bits fossem manipulados corretamente, respeitando os limites do tipo int em Python.
+Compreensão dos Detalhes Matemáticos: O MD5 envolve uma série de operações matemáticas, como rotação de bits (com a função _left_rotate), operações de mistura e o uso de constantes derivadas da parte fracionária da raiz cúbica de números primos. Compreender como essas operações interagem entre si e afetam os valores intermediários foi um dos maiores desafios. Isso exigiu um estudo mais aprofundado da teoria por trás do algoritmo e uma atenção especial ao cálculo das funções de mistura e à manipulação dos registradores.
+Desempenho e Eficiência: A implementação manual do MD5 apresentou desafios relacionados à eficiência, especialmente ao processar entradas de grande tamanho. Embora a execução do algoritmo seja relativamente rápida para entradas pequenas, o processamento de grandes volumes de dados pode ser ineficiente em uma implementação feita manualmente, sem otimizações como o uso de bibliotecas específicas de alto desempenho. O desempenho também foi afetado pela necessidade de realizar uma série de operações repetitivas de manipulação de bits, o que tornou a implementação mais lenta quando comparada a soluções de bibliotecas otimizadas como hashlib.
+Limitações do Algoritmo MD5: Embora a implementação do MD5 tenha sido bem-sucedida, é importante notar que o MD5, por si só, é considerado obsoleto em termos de segurança. O algoritmo é vulnerável a colisões, ou seja, a situação onde duas entradas diferentes geram o mesmo hash. Isso significa que, apesar de ser útil para aprender sobre o funcionamento de algoritmos de hash, o MD5 não deve ser utilizado em sistemas que exigem alto nível de segurança.
+Conclusão
+A implementação manual do algoritmo MD5 foi um exercício educativo valioso, permitindo uma compreensão aprofundada dos detalhes técnicos e matemáticos envolvidos no funcionamento do algoritmo de hash. A implementação foi validada com sucesso ao gerar hashes que coincidem com os valores produzidos pela biblioteca hashlib, demonstrando a exatidão do processo. Além disso, a propriedade de "avalanche", onde pequenas mudanças na entrada resultam em grandes diferenças no hash, foi claramente observada, o que reforça a sensibilidade do algoritmo a alterações mínimas.
+No entanto, ao comparar a implementação manual com a versão otimizada da hashlib, ficou claro que a solução manual não é eficiente em termos de desempenho. A execução de operações bit a bit repetitivas, somada à necessidade de tratamentos de erro e ao manuseio detalhado de dados, torna a versão manual mais lenta, especialmente quando processa grandes volumes de dados.
+A principal limitação do MD5 é sua vulnerabilidade a colisões, o que o torna inadequado para aplicações que exigem alta segurança, como transações financeiras e autenticação de dados sensíveis. Em sistemas críticos, algoritmos mais robustos, como o SHA-256, são altamente recomendados devido à sua maior segurança e resistência a ataques de colisão.
+Pesquisas futuras podem explorar a implementação de algoritmos mais modernos e seguros, como SHA-256, ou até mesmo estudar técnicas de otimização para melhorar a performance de algoritmos de hash. Além disso, o estudo de colisões e ataques de força bruta em algoritmos como o MD5 oferece um campo de pesquisa relevante para entender melhor as vulnerabilidades em sistemas de criptografia.
+A implementação manual do MD5, embora útil para fins educacionais, deve ser substituída por algoritmos mais seguros em contextos práticos, garantindo maior proteção contra ameaças cibernéticas.
+Referências
+IETF. RFC 1321 - MD5 Message-Digest Algorithm. Abril de 1992. Disponível em: https://www.ietf.org/rfc/rfc1321.txt. Acesso em: 30 nov. 2024.
+PANTSMAN0. Código base dividido em arquivos C. Disponível em: https://github.com/pantsman0/md5/blob/master/md5c.c. Acesso em: 1 dez. 2024.
+KINSTA. Utilizando hash em Python. Disponível em: https://kinsta.com/pt/blog/hashing-python/. Acesso em: 28 nov. 2024.
+OVERLEAF. Plataforma para gerar o relatório SBC. Disponível em: https://pt.overleaf.com/latex/templates/sbc-conferences-template/blbxwjwzdngr. Acesso em: 5 dez. 2024.
+Implementações:
+https://colab.research.google.com/drive/1On-AUCgvX39JnBO7b9xs410z9vLqVJhp?usp=sharing
+https://github.com/agu3des/SafeHaven 

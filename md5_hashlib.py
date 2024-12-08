@@ -1,11 +1,12 @@
 import hashlib
+import time
 
+start_time_hashlib = time.time()
 text = "Hello World"
-text2 = input()
 
 hash_object = hashlib.md5(text.encode())
-hash_object2 = hashlib.md5(text2.encode())
 
+print(f"MD5 Hashlib: {hash_object.hexdigest()}")
+end_time_hashlib = time.time()
 
-print(hash_object.hexdigest())
-print(hash_object2.hexdigest())
+print(f"Tempo de execução com hashlib: {end_time_hashlib - start_time_hashlib} segundos")

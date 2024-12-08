@@ -1,6 +1,8 @@
 import struct
 import math
+import time
 
+# Implementação do MD5
 class MD5:
     def __init__(self):
         # Tabela de senhas iniciais baseadas na raiz cúbica de números primos
@@ -62,8 +64,12 @@ class MD5:
     def hexdigest(self):
         return "".join(f"{byte:02x}" for byte in self.digest())
 
-# Uso:
+# Medição de tempo para implementação manual do MD5
+start_time_manual = time.time()
 data = b"Hello World"
 md5 = MD5()
 md5.update(data)
-print(md5.hexdigest())
+print(f"MD5 Manual: {md5.hexdigest()}")
+end_time_manual = time.time()
+
+print(f"Tempo de execução manual: {end_time_manual - start_time_manual} segundos")
