@@ -58,8 +58,6 @@ O MD5 (Message Digest Algorithm 5) é um algoritmo de hash criptográfico que ge
     Saída: O valor hexadecimal do hash MD5 da entrada, que deve ser:
     b10a8db164e0754105b7a99be72e3fe5
 
-
-
 4. Resumindo o Funcionamento
     O algoritmo divide os dados em blocos de 64 bytes.
     Cada bloco é processado em 64 etapas que utilizam operações bitwise, soma modular e rotações.

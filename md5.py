@@ -1,22 +1,30 @@
-import struct
-import math
-import time
+import struct  #empacotar e desempacotar dados binarios
+import math    #funcoes matematicas
+import time    #tempo de execucao
 
 # Implementação do MD5
 class MD5:
-    def __init__(self):
-        # Tabela de senhas iniciais baseadas na raiz cúbica de números primos
-        self._s = [
+    def __init__(self): #construtor
+       # Tabela de deslocamentos (s) e constantes (k)
+        self._s = [ #deslocamento para cada rodada do algoritmo
             (7, 12, 17, 22), (5, 9, 14, 20),
             (4, 11, 16, 23), (6, 10, 15, 21)
         ]
-        self._k = [int((2**32) * abs(math.sin(i + 1))) & 0xFFFFFFFF for i in range(64)]
-        self._buffers = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476]
-        self._original_len = 0
-        self._buffer = b""
+        self._k = [int((2**32) * abs(math.sin(i + 1))) & 0xFFFFFFFF for i in range(64)] #Define os deslocamentos em bits para cada uma das quatro operacoes em cada uma das 16 rodadas. Constantes baseadas na raiz cúbica de numeros primos
+        #Calcula o seno do indice (i + 1)
+        #Toma o valor absoluto do seno
+        #Multiplica pelo valor 2^32
+        #Converte para um inteiro e aplica uma mascara para garantir 32 bits
+        #Adiciona o valor calculado a lista
+        self._buffers = [0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476] #Os quatro registradores que mantem o estado intermediário do hash, iniciados com valores especificos. 32 bits 
+        self._original_len = 0 #Armazena o tamanho total da mensagem em bits, essencial para o padding.
+        self._buffer = b"" #Buffer que armazena os bytes da mensagem até que estejam prontos para serem processados.
 
     def _left_rotate(self, x, c):
         return ((x << c) | (x >> (32 - c))) & 0xFFFFFFFF
+    #Executa uma rotação circular à esquerda de x por c bits. Exemplo: x = 1011(binário) e c = 2, resultado = 1110
+    #Usa operadores de deslocamento e OR bit a bit para realizar a rotacao
+    #Aplica uma máscara 0xFFFFFFFF para garantir que o resultado seja um inteiro de 32 bits
 
     def update(self, input_bytes):
         self._buffer += input_bytes
